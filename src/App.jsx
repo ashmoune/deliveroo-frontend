@@ -1,35 +1,75 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import axios from "axios";
+import logo from "./assets/logo-deliveroo.svg";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [data, setData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  return (
+  const fetchData = async () => {
+    const response = await axios.get(
+      "https://site--deliveroo-backend--rh6mx4gc4kyd.code.run/"
+    );
+    // console.log(response.data);
+    setData(response.data);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return isLoading ? (
+    <span>En cours de chargement... </span>
+  ) : (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <header className="container ">
+        <img className="logo" src={logo} alt="" />
+      </header>
+      <div className=" top-section ">
+        <div className="leftbloc">
+          <h1>{data.restaurant.name}</h1> <p>{data.restaurant.description}</p>
+        </div>
+        <div className="rightbloc">
+          <img src={data.restaurant.picture} alt="" />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <main className="container main-container">
+        <div className="col-left">
+          {data.categories.map((category) => {
+            // si la catégorie n'a pas de plats , on ne l'affiche pas
+            if (category.meals.length !== 0) {
+              return (
+                <div className="menu-container container" key={category.name}>
+                  <h2>{category.name}</h2>
+                  <div className="articles-container">
+                    {category.meals.map((meal) => {
+                      return (
+                        <article key={meal.id}>
+                          <div>
+                            <h3>{meal.title}</h3>
+                            <p className="description">{meal.description}</p>
+                            <span>{meal.price} €</span>
+                            {meal.popular && <span>Populaire</span>}
+                          </div>
+
+                          {meal.picture && (
+                            <img src={meal.picture} alt={meal.title} />
+                          )}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }
+          })}
+          <div className="col-right"></div>
+        </div>
+      </main>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
