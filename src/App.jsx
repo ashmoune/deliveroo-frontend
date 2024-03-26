@@ -6,6 +6,7 @@ import logo from "./assets/logo-deliveroo.svg";
 function App() {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [basket, SetBasket] = useState([]);
 
   const fetchData = async () => {
     const response = await axios.get(
@@ -19,6 +20,21 @@ function App() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // fonction pour ajouter un plat dans le panier
+  const addToBasket = (meal) => {
+    SetBasket([...basket, meal]);
+  };
+  // fonction qui enleve les plats dans le panier
+  const removeFromBasket = (index) => {
+    const newBasket = [...basket];
+    newBasket.splice(index, 1);
+    SetBasket(newBasket);
+  };
+  // fonction qui ajoute un élément dans le apnier
+  const newItem = (index) => {
+    addToBasket(basket[index]);
+  };
 
   return isLoading ? (
     <span>En cours de chargement... </span>
@@ -46,7 +62,7 @@ function App() {
                   <div className="articles-container">
                     {category.meals.map((meal) => {
                       return (
-                        <article key={meal.id}>
+                        <button key={meal.id} onClick={() => addToBasket(meal)}>
                           <div>
                             <h3>{meal.title}</h3>
                             <p className="description">{meal.description}</p>
@@ -57,7 +73,7 @@ function App() {
                           {meal.picture && (
                             <img src={meal.picture} alt={meal.title} />
                           )}
-                        </article>
+                        </button>
                       );
                     })}
                   </div>
@@ -65,7 +81,31 @@ function App() {
               );
             }
           })}
-          <div className="col-right"></div>
+        </div>
+        <div className="col-right">
+          <div className="basket">
+            {basket.length === 0 ? (
+              <p>Votre panier est vide</p>
+            ) : (
+              basket.map((item, index) => {
+                return (
+                  <div key={index}>
+                    <button
+                      onClick={(item) => {
+                        removeFromBasket(item);
+                      }}
+                    >
+                      -
+                    </button>
+
+                    <button onClick={() => newItem(index)}>+</button>
+                    {item.title}
+                    {item.price}
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </main>
     </>
