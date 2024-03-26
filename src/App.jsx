@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
 import logo from "./assets/logo-deliveroo.svg";
+import Basket from "./components/Basket";
 
 function App() {
   const [data, setData] = useState({});
@@ -83,29 +84,11 @@ function App() {
           })}
         </div>
         <div className="col-right">
-          <div className="basket">
-            {basket.length === 0 ? (
-              <p>Votre panier est vide</p>
-            ) : (
-              basket.map((item, index) => {
-                return (
-                  <div key={index}>
-                    <button
-                      onClick={(item) => {
-                        removeFromBasket(item);
-                      }}
-                    >
-                      -
-                    </button>
-
-                    <button onClick={() => newItem(index)}>+</button>
-                    {item.title}
-                    {item.price}
-                  </div>
-                );
-              })
-            )}
-          </div>
+          <Basket
+            basket={basket}
+            removeFromBasket={removeFromBasket}
+            newItem={newItem}
+          />
         </div>
       </main>
     </>
