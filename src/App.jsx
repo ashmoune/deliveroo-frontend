@@ -7,13 +7,12 @@ import Basket from "./components/Basket";
 function App() {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [basket, SetBasket] = useState([]);
+  const [basket, setBasket] = useState([]);
 
   const fetchData = async () => {
     const response = await axios.get(
       "https://site--deliveroo-backend--rh6mx4gc4kyd.code.run/"
     );
-    // console.log(response.data);
     setData(response.data);
     setIsLoading(false);
   };
@@ -24,17 +23,42 @@ function App() {
 
   // fonction pour ajouter un plat dans le panier
   const addToBasket = (meal) => {
-    SetBasket([...basket, meal]);
+    const existingItemIndex = basket.findIndex((item) => item.id === meal.id);
+    console.log(fetchData);
+    if (existingItemIndex !== -1) {
+      // Si l'article est déjà dans le panier, augmentez simplement sa quantité
+      const newBasket = [...basket];
+      newBasket[existingItemIndex].quantity++;
+      setBasket(newBasket);
+    } else {
+      // Sinon, ajoutez l'article au panier avec une quantité de 1
+      setBasket([...basket, { ...meal, quantity: 1 }]);
+    }
   };
-  // fonction qui enleve les plats dans le panier
+
+  // fonction qui enlève un plat du panier
   const removeFromBasket = (index) => {
     const newBasket = [...basket];
     newBasket.splice(index, 1);
-    SetBasket(newBasket);
+    setBasket(newBasket);
   };
-  // fonction qui ajoute un élément dans le apnier
-  const newItem = (index) => {
-    addToBasket(basket[index]);
+
+  // fonction qui ajoute une quantité à un élément du panier
+  const incrementItem = (index) => {
+    const newBasket = [...basket];
+    newBasket[index].quantity++;
+    setBasket(newBasket);
+  };
+
+  // fonction qui enlève une quantité à un élément du panier
+  const decrementItem = (index) => {
+    const newBasket = [...basket];
+    if (newBasket[index].quantity > 1) {
+      newBasket[index].quantity--;
+      setBasket(newBasket);
+    } else {
+      removeFromBasket(index);
+    }
   };
 
   return isLoading ? (
@@ -87,7 +111,8 @@ function App() {
           <Basket
             basket={basket}
             removeFromBasket={removeFromBasket}
-            newItem={newItem}
+            incrementItem={incrementItem}
+            decrementItem={decrementItem}
           />
         </div>
       </main>
